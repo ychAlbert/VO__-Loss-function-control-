@@ -5,6 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from network import VODataset, VOModel
+from correction_net import CorrectionNet
 
 def visualize_trajectory(poses, title='Trajectory'):
     """
@@ -145,6 +146,22 @@ def compute_reprojection_correction(model, left_img, right_img, left_depth, righ
         
     return corrected_point, corrected_weight
 
+def test_correction_net():
+    """
+    测试 CorrectionNet 模型
+    """
+    # 加载示例图像块和光流
+    img_patch = torch.randn(1, 3, 32, 32)  # 示例图像块
+    flow = torch.randn(1, 2, 32, 32)  # 示例光流
+
+    # 初始化模型
+    model = CorrectionNet()
+    
+    # 前向传播
+    correction = model(img_patch, flow)
+    
+    print(f'修正量: {correction}')
+
 def main():
     # 示例用法
     dataset_path = 'P001'
@@ -186,6 +203,8 @@ def main():
     point = (100, 100)
     corrected_point, corrected_weight = compute_reprojection_correction(model, left_img, right_img, left_depth, right_depth, flow, point)
     print(f'改正后的点: {corrected_point}, 改正后的权重: {corrected_weight}')
+
+    test_correction_net()
 
 if __name__ == '__main__':
     main()
